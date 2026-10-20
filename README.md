@@ -32,6 +32,10 @@ docker run --rm --network host \
 
 `INPUT_NUMBER` selects the input used to read door state, and `RELAY_NUMBER` selects the relay to pulse. Both default to `1`. The app listens on port 8080 and is designed for mobile screens.
 
+## Install as an app
+
+Open the app in a supported mobile browser and choose its install or add-to-home-screen option. The app shell is cached for offline opening; relay status and the camera still require a network connection. Service workers require HTTPS, except when testing on localhost.
+
 ## Device protocol notes
 
 This wrapper uses the ControlByWeb XML endpoint:

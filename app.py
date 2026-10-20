@@ -3,7 +3,7 @@ import time
 from xml.etree import ElementTree as ET
 
 import requests
-from flask import Flask, Response, jsonify, render_template_string
+from flask import Flask, Response, jsonify, render_template_string, send_from_directory
 
 app = Flask(__name__)
 
@@ -19,6 +19,12 @@ HTML = """
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/static/manifest.webmanifest" />
+    <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/static/icon.svg" />
     <title>Garage Relay</title>
     <style>
       :root {
@@ -304,6 +310,11 @@ HTML = """
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
       document.addEventListener('touchend', handleTouchEnd, { passive: true });
       document.addEventListener('touchcancel', finishPull, { passive: true });
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
       fetchRelay();
       refreshCamera();
       setInterval(fetchRelay, refreshSeconds * 1000);
@@ -394,6 +405,13 @@ def camera_snapshot():
 @app.route("/")
 def index():
     return render_template_string(HTML, camera_url="/api/camera/latest.jpg", refresh_seconds=REFRESH_SECONDS)
+
+
+@app.get("/sw.js")
+def service_worker():
+  response = send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
+  response.headers["Cache-Control"] = "no-cache"
+  return response
 
 
 if __name__ == "__main__":
