@@ -145,9 +145,24 @@ HTML = """
         font-size: 0.9rem;
         min-height: 20px;
       }
+      .refresh-indicator {
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 50%;
+        padding: 10px 16px;
+        border-radius: 0 0 10px 10px;
+        background: var(--panel-2);
+        color: var(--text);
+        font-size: 0.85rem;
+        transform: translate(-50%, -100%);
+        transition: transform 180ms ease;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
+    <div class="refresh-indicator" id="refreshIndicator" aria-live="polite" aria-hidden="true">Pull to refresh</div>
     <main class="shell">
       <header class="header">
         <h1 class="title">Garage Relay</h1>
@@ -181,7 +196,12 @@ HTML = """
       const pulseButton = document.getElementById('pulseButton');
       const errorBox = document.getElementById('errorBox');
       const cameraImage = document.getElementById('cameraImage');
+      const refreshIndicator = document.getElementById('refreshIndicator');
       const refreshSeconds = {{ refresh_seconds }};
+      const refreshThreshold = 72;
+      let touchStartY = 0;
+      let pullDistance = 0;
+      let trackingPull = false;
 
       function setError(message) {
         errorBox.textContent = message || '';
@@ -230,7 +250,59 @@ HTML = """
         cameraImage.src = '/api/camera/latest.jpg?t=' + Date.now();
       }
 
+      function finishPull() {
+        trackingPull = false;
+        refreshIndicator.style.transition = 'transform 180ms ease';
+        refreshIndicator.style.transform = 'translate(-50%, -100%)';
+        refreshIndicator.setAttribute('aria-hidden', 'true');
+      }
+
+      function handleTouchStart(event) {
+        if (event.touches.length !== 1 || window.scrollY > 0 || event.target.closest('button')) {
+          trackingPull = false;
+          return;
+        }
+        touchStartY = event.touches[0].clientY;
+        pullDistance = 0;
+        trackingPull = true;
+      }
+
+      function handleTouchMove(event) {
+        if (!trackingPull) return;
+        if (event.touches.length !== 1) {
+          finishPull();
+          return;
+        }
+        pullDistance = Math.max(0, event.touches[0].clientY - touchStartY);
+        if (pullDistance === 0) return;
+
+        event.preventDefault();
+        refreshIndicator.setAttribute('aria-hidden', 'false');
+        refreshIndicator.style.transition = 'none';
+        refreshIndicator.textContent = pullDistance >= refreshThreshold ? 'Release to refresh' : 'Pull to refresh';
+        refreshIndicator.style.transform = 'translate(-50%, ' + (Math.min(pullDistance, 96) - 44) + 'px)';
+      }
+
+      function handleTouchEnd() {
+        if (!trackingPull) return;
+        trackingPull = false;
+        if (pullDistance >= refreshThreshold) {
+          refreshIndicator.textContent = 'Refreshing...';
+          refreshIndicator.style.transition = 'transform 180ms ease';
+          refreshIndicator.style.transform = 'translate(-50%, 0)';
+          fetchRelay();
+          refreshCamera();
+          setTimeout(finishPull, 700);
+          return;
+        }
+        finishPull();
+      }
+
       pulseButton.addEventListener('click', pulseRelay);
+      document.addEventListener('touchstart', handleTouchStart, { passive: true });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd, { passive: true });
+      document.addEventListener('touchcancel', finishPull, { passive: true });
       fetchRelay();
       refreshCamera();
       setInterval(fetchRelay, refreshSeconds * 1000);
