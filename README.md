@@ -1,6 +1,6 @@
 # ControlByWeb Relay Mobile Wrapper
 
-A lightweight mobile-first Flask wrapper for a ControlByWeb X-301 device on the local network. It shows the current status for relay 1, includes a large pulse button to trigger the relay, and refreshes a camera snapshot every 5 seconds.
+A lightweight mobile-first Flask wrapper for a ControlByWeb X-301 device on the local network. It shows the current status for input 1, includes a large pulse button to trigger relay 1, and refreshes a camera snapshot every 5 seconds.
 
 ## Run locally
 
@@ -25,10 +25,12 @@ For a Linux host with LAN name resolution:
 docker run --rm --network host \
   -e DEVICE_BASE_URL=http://webrelay.local \
   -e CAMERA_URL=http://IP:PORT/snapshot.jpg \
+  -e INPUT_NUMBER=1 \
+  -e RELAY_NUMBER=1 \
   controlbyweb-relay
 ```
 
-The app listens on port 8080 and is designed for mobile screens.
+`INPUT_NUMBER` selects the input used to read door state, and `RELAY_NUMBER` selects the relay to pulse. Both default to `1`. The app listens on port 8080 and is designed for mobile screens.
 
 ## Device protocol notes
 

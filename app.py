@@ -10,6 +10,7 @@ app = Flask(__name__)
 DEVICE_BASE_URL = os.getenv("DEVICE_BASE_URL", "http://webrelay.local")
 CAMERA_URL = os.getenv("CAMERA_URL", "http://localhost/snapshot.jpg")
 RELAY_NUMBER = int(os.getenv("RELAY_NUMBER", "1"))
+INPUT_NUMBER = int(os.getenv("INPUT_NUMBER", "1"))
 REFRESH_SECONDS = int(os.getenv("REFRESH_SECONDS", "5"))
 
 HTML = """
@@ -321,9 +322,9 @@ def get_input_state() -> int:
     response = requests.get(device_url("state.xml"), timeout=5)
     response.raise_for_status()
     root = ET.fromstring(response.text)
-    input_value = root.findtext("input1state")
+    input_value = root.findtext(f"input{INPUT_NUMBER}state")
     if input_value is None:
-        raise ValueError("input1state not found in XML response")
+      raise ValueError(f"input{INPUT_NUMBER}state not found in XML response")
     return int(input_value)
 
 
@@ -353,7 +354,7 @@ def relay_status():
     try:
         state = get_input_state()
         return jsonify({
-            "sensor": "input1",
+            "sensor": f"input{INPUT_NUMBER}",
             "state": state,
             "door": "closed" if state else "open",
             "state_text": "CLOSED" if state else "OPEN",
