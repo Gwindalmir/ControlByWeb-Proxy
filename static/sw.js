@@ -1,4 +1,4 @@
-const CACHE_NAME = 'garage-relay-shell-v1';
+const CACHE_NAME = 'garage-door-shell-v1';
 const SHELL_URLS = ['/', '/static/manifest.webmanifest', '/static/icon.svg'];
 
 self.addEventListener('install', (event) => {

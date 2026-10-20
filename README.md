@@ -1,4 +1,4 @@
-# ControlByWeb Relay Mobile Wrapper
+# ControlByWeb Garage Door Mobile Wrapper
 
 A lightweight mobile-first Flask wrapper for a ControlByWeb X-301 device on the local network. It shows the current status for input 1, includes a large pulse button to trigger relay 1, and refreshes a camera snapshot every 5 seconds.
 

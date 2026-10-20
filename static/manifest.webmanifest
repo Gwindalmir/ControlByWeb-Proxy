@@ -1,6 +1,6 @@
 {
-  "name": "Garage Relay",
-  "short_name": "Garage Relay",
+  "name": "Garage Door",
+  "short_name": "Garage Door",
   "description": "Garage door status, relay control, and camera snapshot.",
   "start_url": "/",
   "scope": "/",

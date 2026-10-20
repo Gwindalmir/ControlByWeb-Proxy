@@ -25,7 +25,7 @@ HTML = """
     <link rel="manifest" href="/static/manifest.webmanifest" />
     <link rel="icon" href="/static/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/static/icon.svg" />
-    <title>Garage Relay</title>
+    <title>Garage Door</title>
     <style>
       :root {
         --bg: #111827;
@@ -172,7 +172,7 @@ HTML = """
     <div class="refresh-indicator" id="refreshIndicator" aria-live="polite" aria-hidden="true">Pull to refresh</div>
     <main class="shell">
       <header class="header">
-        <h1 class="title">Garage Relay</h1>
+        <h1 class="title">Garage Door</h1>
       </header>
 
       <section class="status-wrap">
